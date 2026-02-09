@@ -5,34 +5,34 @@
 // -------------------------------------------------------------------------------
 // Common functoions used by the animations
 
-void lfado(byte bbc)
+void lfado(uint8_t bbc)
 {
-  for ( byte hhh = 0; hhh < MATRIX_WIDTH ; hhh++)
-    for (byte jjj = 0; jjj < MATRIX_HEIGHT ; jjj++)
+  for ( uint16_t hhh = 0; hhh < MATRIX_WIDTH ; hhh++)
+    for (uint16_t jjj = 0; jjj < MATRIX_HEIGHT ; jjj++)
       zeds(hhh, jjj).fadeToBlackBy(bbc);//% = bbc/255
 }
 
-void redfado(byte bbc) {
-  for ( byte hhh = 0; hhh < MATRIX_WIDTH ; hhh++)
-    for (byte jjj = 0; jjj < MATRIX_HEIGHT ; jjj++)
+void redfado(uint8_t bbc) {
+  for ( uint16_t hhh = 0; hhh < MATRIX_WIDTH ; hhh++)
+    for (uint16_t jjj = 0; jjj < MATRIX_HEIGHT ; jjj++)
       if (flip2)
         zeds(hhh, jjj) -= CRGB(random(bbc / 2), random(bbc), random(bbc));//leave more red
       else
         zeds(hhh, jjj) -= CRGB(random(bbc / 2), random(bbc / 2), random(bbc));// leave more yellow
 }
 
-void greenfado(byte bbc) {
-  for ( byte hhh = 0; hhh < MATRIX_WIDTH ; hhh++)
-    for (byte jjj = 0; jjj < MATRIX_HEIGHT ; jjj++)
+void greenfado(uint8_t bbc) {
+  for ( uint16_t hhh = 0; hhh < MATRIX_WIDTH ; hhh++)
+    for (uint16_t jjj = 0; jjj < MATRIX_HEIGHT ; jjj++)
       if (!flip3)
         zeds(hhh, jjj) -= CRGB(random(bbc ), random(bbc / 2), random(bbc));
       else
         zeds(hhh, jjj) -= CRGB(random(bbc ), random(bbc / 2), random(bbc / 2));// leave more teal
 }
 
-void bluefado(byte bbc) {
-  for ( byte hhh = 0; hhh < MATRIX_WIDTH ; hhh++)
-    for (byte jjj = 0; jjj < MATRIX_HEIGHT ; jjj++)
+void bluefado(uint8_t bbc) {
+  for ( uint16_t hhh = 0; hhh < MATRIX_WIDTH ; hhh++)
+    for (uint16_t jjj = 0; jjj < MATRIX_HEIGHT ; jjj++)
       if (flip2)
         zeds(hhh, jjj) -= CRGB(random(bbc ), random(bbc), random(bbc / 2));
       else
@@ -98,8 +98,8 @@ void adjuster() {  // applies the screen wide effect
 
 void td_init() {
   // File-wise init
-  driftx = random8(4, MATRIX_WIDTH - 4);//set an initial location for the animation center
-  drifty = random8(4, MATRIX_HEIGHT - 4);// set an initial location for the animation center
+  driftx = random8(4, min(255,MATRIX_WIDTH - 4));//set an initial location for the animation center
+  drifty = random8(4, min(255,MATRIX_HEIGHT - 4));// set an initial location for the animation center
   mstep = byte( 256 / (MATRIX_WIDTH - 1)); //mstep is the step size to distribute 256 over an array the width of the matrix
  steper = random8(2, 8);// steper is used to modify h to generate a color step on each move
   lastmillis = millis();
