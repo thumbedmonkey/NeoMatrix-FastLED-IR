@@ -42,6 +42,10 @@
     #define mheight 32
     uint8_t PANELCONFNUM = 0;
     #pragma message "autoconf found height 32, panelconf 0"
+#elif defined(GFXDISPLAY_M350BY12)
+    uint8_t PANELCONFNUM = 2;
+    #define mheight 12
+    #pragma message "autoconf found fence height 12, panelconf 2"
 #elif defined(ESP32)
     #if defined(M64BY64) || defined(GFXDISPLAY_M64BY64_multi4)
 	#define mheight 64
@@ -111,6 +115,9 @@ uint8_t led_brightness = 64;
 	    #endif
 	#endif
     #endif
+
+#elif mheight == 12
+    uint8_t DFL_MATRIX_BRIGHTNESS_LEVEL = 5;
 
 #elif mheight == 64
     uint8_t DFL_MATRIX_BRIGHTNESS_LEVEL = 6;

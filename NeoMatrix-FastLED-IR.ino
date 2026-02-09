@@ -113,10 +113,11 @@ bool MATRIX_RESET_DEMO = true;
 
 // Different panel configurations: 24x32, 64x64 (BM), 64x96 (BM), 64x96 (Trance), 128x192
 #define CONFIGURATIONS 6
+// PANELCONFNUM is set in nfldefine
 const char *panelconfnames[CONFIGURATIONS] = {
     "Neopixel Shirt 24x32 ESP8266",
     "Burning Man Neopixel Panel 64x64 ESP32",
-    "SmartMatrix Shirt BM 64x96 ESP32",
+    "Fence 350x12",
     "SmartMatrix Shirt Dance 64x96 ESP32",
     "RPI-RGB-Panels Shirt Dance 128x192 rPi",
     "Shirt Dance 128x192 rPi BestOf Groups" };
@@ -435,6 +436,7 @@ void help() {
     Serial.println("'b/B' Bestof1");
     Serial.println("'y/Y' Bestof2");
     Serial.println("'a/A' All Demos");
+    Serial.println("'x/X' changePanelConf 2");
     Serial.println("'c/C' changePanelConf 3");
     Serial.println("'d/D' changePanelConf 4");
     Serial.println("'e/E' changePanelConf 5 (special demos)");
@@ -971,7 +973,7 @@ uint8_t rotate_text(uint32_t whichone=0) {
 	{ "Make",   "Trance",	"Great",	"Again",    "",		    "" }, //25
     };
 
-    if (PANELCONFNUM == 2 || PANELCONFNUM == 3) text[0][2] = "BURN";
+    if (PANELCONFNUM == 2) text[0][2] = "BURN";
 
     // https://www.w3schools.com/colors/colors_picker.asp
     uint32_t color[][6] = {
@@ -1098,6 +1100,8 @@ uint8_t rotate_text(uint32_t whichone=0) {
       else if (mheight >=  96) line =  y_offset_96[numlines][l];
       else if (mheight >=  64) line =  y_offset_64[numlines][l];
       else if (mheight >=  32) line =  y_offset_32[numlines][l];
+      // these values are not correct, but will compile without error
+      else  line =  y_offset_32[numlines][l];
       // printf("Got %d  %d out of %d\n", whichone, l, numlines);
       String textdisp = String(text[whichone][l]);
       if (mheight <=  96) textdisp.toUpperCase();
@@ -1789,7 +1793,8 @@ uint8_t GifAnim(uint32_t idx) {
 
     // force the last index to detect too many initializers
     const Animgif animgif[360] = {
-	#if mheight <= 32
+        // Less memory, so we have a smaller array
+	#ifdef ESP8266
 /* 000 */   {"/gifs/32anim_photon.gif",			10, -4, 0, 10, 10, 0, 0 },
 	    {"/gifs/32anim_flower.gif",			10, -4, 0, 10, 10, 0, 0 },
 	    {"/gifs/32anim_balls.gif",			10, -4, 0, 10, 10, 0, 0 },
@@ -2970,7 +2975,7 @@ uint8_t white_test(uint32_t unused) {
 // animated gifs on 32h, or shared animated gifs on 64/96/192h, and 160+ for unshared
 // animated gifs in 64/96/192h)
 // however, at runtime the ESP32 can switch from its own resolution demos
-// PANELCONFNUM 0:24x32, 1:64x64 (BM), 2:64x96 (BM), 3:64x96 (Trance), 4:128x192, 5: 128x192 alternate demos
+// PANELCONFNUM 0:24x32, 1:64x64 (BM), 2:350x12 (fence), 3:64x96 (Trance), 4:128x192, 5: 128x192 alternate demos
 uint16_t demoidx(uint16_t idx) {
     if (idx<100) return idx;
 
@@ -4044,6 +4049,7 @@ void IR_Serial_Handler() {
 	    else if (readchar == 'B') { Serial.println("ESP => Bestof1");	send_serial("b"); changeBestOf(1); }
 	    else if (readchar == 'A') { Serial.println("ESP => All Demos");	send_serial("a"); changeBestOf(0); }
 	    else if (readchar == '_') { Serial.println("ESP => Keep Demo?");    send_serial("=");}
+	    else if (readchar == 'X') { Serial.println("ESP => ChangePanel2");  changePanelConf(2); send_serial("x");}
 	    else if (readchar == 'C') { Serial.println("ESP => ChangePanel3");  changePanelConf(3); send_serial("c");}
 	    else if (readchar == 'D') { Serial.println("ESP => ChangePanel4");  changePanelConf(4); send_serial("d");}
 	    else if (readchar == 'E') { Serial.println("ESP => ChangePanel5");  changePanelConf(5); send_serial("e");}
@@ -4055,6 +4061,7 @@ void IR_Serial_Handler() {
 	    else if (readchar == 'r') { Serial.println("Reboot"); resetFunc(); }
 	    // This seems the easiest way for the rPI
 	    else if (readchar == 'i') { Serial.println("Serial => showip");     showip();}
+	    else if (readchar == 'x') { changePanelConf(2); }
 	    else if (readchar == 'c') { changePanelConf(3); }
 	    else if (readchar == 'd') { changePanelConf(4); }
 	    else if (readchar == 'e') { changePanelConf(5); }
@@ -5721,7 +5728,8 @@ void setup() {
     // This is now required, if there is no arduino FS support, you need to replace this function
     // You could feed it a hardcoded array in the code (what used to be here, go back in git history
     // for an older version)
-    Serial.println("Read config file");
+    Serial.print("Read config file for PANELCONFNUM from nfldefines: ");
+    Serial.println(PANELCONFNUM);
     read_config_index();
 
 #ifdef NEOPIXEL_PIN
