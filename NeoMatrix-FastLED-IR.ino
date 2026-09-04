@@ -4481,6 +4481,10 @@ void IR_Serial_Handler() {
             }
             #endif
 
+            if (new_pattern && !startcmd) { 
+                Serial.printf("Ignoring pattern %d before receiving |St\r\n", readchar);
+                goto endserial; 
+            }
 	    if (new_pattern > DEMO_LAST_IDX) new_pattern = 0;
 	    if (new_pattern) {
 		Serial.print("Got new");
