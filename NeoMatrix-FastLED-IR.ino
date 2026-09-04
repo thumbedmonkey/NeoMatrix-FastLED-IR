@@ -4152,9 +4152,9 @@ void change_brightness(int8_t change, bool absolute=false) {
     // rgbpanels are dim, bump up brightness
     #if defined(GFXDISPLAY_M128BY192ABCPWM)
         // PWM panels are brighter, let's not bump up as much here
-        uint8_t rgbpanel_brightness = 31+min( (1 << (brightness+1)), 224);
+        uint8_t rgbpanel_brightness = 31+min( (1 << (brightness)), 255);
     #else
-        uint8_t rgbpanel_brightness = 31+min( (1 << (brightness+2)), 224);
+        uint8_t rgbpanel_brightness = 31+min( (1 << (brightness+2)), 255);
     #endif
     // neopixels are bright, we tone brightness down
     matrix_brightness = (1 << (brightness-1)) - 1;
